@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
 import './App.css'
 
 function App() {
-  const [numberOne, setNumberOne] = useState(0)
-  const [numberTwo, setNumberTwo] = useState(0)
-  const [character, setCharacter] = useState("")
+  const [numberOne, setNumberOne] = useState("0")
+  const [numberTwo, setNumberTwo] = useState("0")
+  const [result, setResult] = useState(true)
+  const [character, setCharacter] = useState("+")
   const [clearAll, setClearAll] = useState(false)
   
   const numbers = [
@@ -26,121 +27,157 @@ function App() {
     "*",
     "-",
     "+",
-    "Enter",
-  ]
-  const special = [
-    "Backspace",
-    "Escape",
   ]
 
   const setValue = (key) => {
+    console.log(key)
     setClearAll(false)
+    if(key==="clear"){
+      clear()
+      return;
+    }
     if(numbers.includes(key)){
+      setResult(false)
       if(key==="."){
         if(!numberOne.includes(".")){
           setNumberOne(numberOne+key)
         }
       }else{
-        if(!numberOne || !numberOne===0){
+        if(!numberOne || !numberOne===0 || result){
           setNumberOne(key)
+          setResult(false)
         }else{
           setNumberOne(numberOne+key)
         }
       }
     }
-    if(characters.includes(key)){
-      setCharacter(key)
-      switch(key){
+    if(characters.includes(key) || key==="Enter"){
+      if(characters.includes(key)){
+        setCharacter(key)
+      }
+      if(result) {return};
+      switch(character){
         case "-":
-          setNumberTwo(`${numberOne.toString()}-`)
+            setNumberOne(parseFloat(numberTwo)-parseFloat(numberOne))
+            setTwo(parseFloat(numberTwo)-parseFloat(numberOne))
           break;
-          
+
         case "+":
-          setNumberTwo(`${numberOne.toString()}+`)
+            setNumberOne(parseFloat(numberTwo)+parseFloat(numberOne))
+            setTwo(parseFloat(numberTwo)+parseFloat(numberOne))
           break;
 
         case "*":
-          setNumberTwo(`${numberOne.toString()}*`)
+            setNumberOne(parseFloat(numberTwo)*parseFloat(numberOne))
+            setTwo(parseFloat(numberTwo)*parseFloat(numberOne))
           break;
 
         case "/":
-          setNumberTwo(`${numberOne.toString()}/`)
+            setNumberOne(parseFloat(numberTwo)/parseFloat(numberOne))
+            setTwo(parseFloat(numberTwo)/parseFloat(numberOne))
           break;
-
         default:
           break;
       }
-      setNumberOne(0)
+      setResult(true)
     }
     if(key==="Escape"){
-      if(clearAll){
-        setNumberOne(0)
-        setNumberTwo(0)
-        setCharacter("")
-      }else{
-        setNumberOne(0)
-        setCharacter("")
-      }
-      setClearAll(!clearAll)
+      clear()
     }
     if(key==="Backspace"){
       if(numberOne){
-        setNumberOne(numberOne.slice(0, numberOne.length-1))
+        if(numberOne.length>1){
+          setNumberOne(numberOne.slice(0, numberOne.length-1))
+        }else{
+          setNumberOne(0)
+        }
       }
     }
   }
 
-  const keyUp = (event) => {
-    setValue(event.key)
+  const setTwo = (nmbr) =>{
+    setNumberTwo(nmbr)
   }
 
-  const setClear = () =>{
+  const keyUp = (e) => {
+    setValue(e.key)
+  }
+
+  const clear = () =>{
+    if(clearAll){
+      setNumberOne("0")
+      setNumberTwo("0")
+      setCharacter("+")
+    }else{
+      setNumberOne("0")
+      setCharacter("+")
+    }
     setClearAll(!clearAll)
   }
 
-  const keyFunction = (key) => {
-    console.log(key)
-    keyUp(key)
-  }
+  const list = [
+    {small: true, label: "/"},
+    {small: true, label: "7"},
+    {small: true, label: "4"},
+    {small: true, label: "1"},
+    {small: true, label: "0"},
+    {small: true, label: "*"},
+    {small: true, label: "8"},
+    {small: true, label: "5"},
+    {small: true, label: "2"},
+    {small: true, label: "."},
+    {small: true, label: "-"},
+    {small: true, label: "9"},
+    {small: true, label: "6"},
+    {small: true, label: "3"},
+    {small: true, label: "clear"},
+    {small: true, label: "🔙"},
+    {small: false, label: "+"},
+    {small: false, label: "enter"},
+  ]
 
   return (
-    <Box tabIndex={0} onKeyUp={(e) => {console.log(e);console.log("succes")}} >
-      <CalculatorBody>
-        <CalculatorBodyTop>{numberTwo}</CalculatorBodyTop>
-        <CalculatorBodyMid>{numberOne}</CalculatorBodyMid>
-        <CalculatorBodyBot>
-          <CalculatorButton small={true} label={"/"}></CalculatorButton>
-          <CalculatorButton small={true} label={"7"}></CalculatorButton>
-          <CalculatorButton small={true} label={"4"}></CalculatorButton>
-          <CalculatorButton small={true} label={"1"}></CalculatorButton>
-          <CalculatorButton small={true} label={"0"}></CalculatorButton>
-          <CalculatorButton small={true} label={"*"}></CalculatorButton>
-          <CalculatorButton small={true} label={"8"}></CalculatorButton>
-          <CalculatorButton small={true} label={"5"}></CalculatorButton>
-          <CalculatorButton small={true} label={"2"}></CalculatorButton>
-          <CalculatorButton small={true} label={"."}></CalculatorButton>
-          <CalculatorButton small={true} label={"-"}></CalculatorButton>
-          <CalculatorButton small={true} label={"9"}></CalculatorButton>
-          <CalculatorButton small={true} label={"6"}></CalculatorButton>
-          <CalculatorButton small={true} label={"3"}></CalculatorButton>
-          <CalculatorButton small={true} label={`${clearAll ? "AC" : "C"}`} onClick={() => setClear()}></CalculatorButton>
-          <CalculatorButton small={true} label={"-"}></CalculatorButton>
-          <CalculatorButton small={false} label={"+"}></CalculatorButton>
-          <CalculatorButton small={false} label={"enter"}></CalculatorButton>
-        </CalculatorBodyBot>
-      </CalculatorBody>
-    </Box>
+    <Body  tabIndex={0} onKeyUp={(e) => {keyUp(e)}}>
+      <Box>
+        <CalculatorBody>
+          <CalculatorBodyTop>{numberTwo}</CalculatorBodyTop>
+          <CalculatorBodyTop>{character}</CalculatorBodyTop>
+          <CalculatorBodyMid>{numberOne}</CalculatorBodyMid>
+          <CalculatorBodyBot>
+            {list.map(ele => {
+              return (
+              <CalculatorButton 
+                small={ele.small} 
+                label={ele.label==="clear"? clearAll ? "AC" : "C" : ele.label} 
+                onClick={() => setValue(ele.label==="🔙"? "Backspace" : ele.label==="enter"? "Enter" : ele.label)}
+              ></CalculatorButton>)
+            })}
+          </CalculatorBodyBot>
+        </CalculatorBody>
+      </Box>
+    </Body>
   )
 }
 
+const Body = styled.div`
+  margin-top: -35px;
+  margin-left: -102px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 99vw;
+  height: 96vh;
+`;
+
 const Box = styled.div`
-  background-color: #FFBB34;
+  background-color: #43bbff;
   width: 400px;
   height: 700px;
   display: flex;
   justify-content: space-around;
   align-items: center;
 `;
+
 const CalculatorBody = styled.div`
   width: 95%;
   height: 95%;
@@ -150,6 +187,7 @@ const CalculatorBody = styled.div`
   justify-content: space-around;
   align-items: center;
 `;
+
 const CalculatorBodyTop = styled.div`
   margin-top: 10px;
   margin-right: 10px;
@@ -158,8 +196,8 @@ const CalculatorBodyTop = styled.div`
   font-size: 20px;
   width: 95%;
   height: 15%;
-
 `;
+
 const CalculatorBodyMid = styled.div`
   margin-right: 10px;
   display: flex;
@@ -167,8 +205,8 @@ const CalculatorBodyMid = styled.div`
   font-size: 30px;
   width: 95%;
   height: 10%;
-
 `;
+
 const CalculatorBodyBot = styled.div`
   margin: 2px;
   width: 95%;
