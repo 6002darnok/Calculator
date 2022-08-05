@@ -1,4 +1,4 @@
-#Calculator
+# Calculator
 
 Simple calculator, made with react. -rest API -styled-components
 
